@@ -60,6 +60,7 @@ KERNEL_RPMS=(
     "/tmp/kernel-rpms/kernel-modules-core-${KERNEL_VERSION}.rpm"
     "/tmp/kernel-rpms/kernel-modules-extra-${KERNEL_VERSION}.rpm"
     "/tmp/kernel-rpms/kernel-uki-virt-${KERNEL_VERSION}.rpm"
+    "/tmp/kernel-rpms/kernel-devel-${KERNEL_VERSION}.rpm"
 )
 dnf5 -y install "${KERNEL_RPMS[@]}"
 dnf5 versionlock add kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
@@ -104,3 +105,6 @@ fi
 CSFG=/usr/lib/systemd/system-generators/coreos-sulogin-force-generator
 curl -sSLo ${CSFG} https://raw.githubusercontent.com/coreos/fedora-coreos-config/refs/heads/stable/overlay.d/05core/usr/lib/systemd/system-generators/coreos-sulogin-force-generator
 chmod +x ${CSFG}
+
+/ctx/zfs.sh
+/ctx/root.sh
