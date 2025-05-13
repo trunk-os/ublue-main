@@ -3,9 +3,9 @@
 set -ouex pipefail
 
 # Enable getty on tty1 for image with no Display Manager
-if [[ "$IMAGE_NAME" == "base" ]]; then
+#if [[ "$IMAGE_NAME" == "base" ]]; then
     systemctl enable getty@tty1
-fi
+#fi
 
 # Workaround: Rename just's CN readme to README.zh-cn.md 
 mv '/usr/share/doc/just/README.中文.md' '/usr/share/doc/just/README.zh-cn.md'
@@ -27,7 +27,7 @@ ln -s "/usr/share/fonts/google-noto-sans-cjk-fonts" "/usr/share/fonts/noto-cjk"
 # Remove coprs
 dnf5 -y copr remove ublue-os/staging
 dnf5 -y copr remove ublue-os/packages
-dnf5 -y copr remove kylegospo/oversteer
+#dnf5 -y copr remove kylegospo/oversteer
 
 # Disable Negativo17 Fedora Multimedia
 # This needs to be a whole organiztion change
@@ -49,6 +49,10 @@ chmod -R 1777 /var/tmp
 
 # Check to make sure important packages are present
 /ctx/check-build.sh
+
+dnf5 clean all
+rm -rf /var/cache/libdnf5
+rm -f /var/log/dnf5.log
 
 # bootc/ostree checks
 bootc container lint

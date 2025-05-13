@@ -1,0 +1,18 @@
+# vim: ft=systemd
+[Unit]
+Description=Gild is an API agent for Trunk
+DefaultDependencies=yes
+After=buckle.service
+After=network-online.target
+Conflicts=umount.target
+Before=umount.target
+
+[Service]
+Type=exec
+ExecStartPre=-mkdir -p /trunk/gild
+ExecStartPre=-/usr/bin/podman rm -f gild
+ExecStart=/usr/bin/podman run --pull=always --name gild -p 5309:5309 --volumes-from buckle --security-opt label=disable -v /trunk:/trunk:shared quay.io/trunk-os/gild:latest
+Restart=always
+
+[Install]
+WantedBy=default.target

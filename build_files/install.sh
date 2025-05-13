@@ -21,7 +21,7 @@ dnf5 -y swap --repo='fedora' \
 # Add COPRs
 dnf5 -y copr enable ublue-os/packages
 dnf5 -y copr enable ublue-os/staging
-dnf5 -y copr enable kylegospo/oversteer
+#dnf5 -y copr enable kylegospo/oversteer
 
 # Install ublue-os pacakges, fedora archives,and zstd
 dnf5 -y install \
@@ -34,14 +34,14 @@ dnf5 -y install \
     fedora-repos-archive \
     zstd
 
-# use negativo17 for 3rd party packages with higher priority than default
-if ! grep -q fedora-multimedia <(dnf5 repolist); then
-    # Enable or Install Repofile
-    dnf5 config-manager setopt fedora-multimedia.enabled=1 ||
-        dnf5 config-manager addrepo --from-repofile="https://negativo17.org/repos/fedora-multimedia.repo"
-fi
+# # use negativo17 for 3rd party packages with higher priority than default
+# if ! grep -q fedora-multimedia <(dnf5 repolist); then
+#     # Enable or Install Repofile
+#     dnf5 config-manager setopt fedora-multimedia.enabled=1 ||
+#         dnf5 config-manager addrepo --from-repofile="https://negativo17.org/repos/fedora-multimedia.repo"
+# fi
 # Set higher priority
-dnf5 config-manager setopt fedora-multimedia.priority=90
+#dnf5 config-manager setopt fedora-multimedia.priority=90
 
 # Replace podman provided policy.json with ublue-os one.
 mv /usr/etc/containers/policy.json /etc/containers/policy.json
@@ -60,39 +60,40 @@ KERNEL_RPMS=(
     "/tmp/kernel-rpms/kernel-modules-core-${KERNEL_VERSION}.rpm"
     "/tmp/kernel-rpms/kernel-modules-extra-${KERNEL_VERSION}.rpm"
     "/tmp/kernel-rpms/kernel-uki-virt-${KERNEL_VERSION}.rpm"
+    "/tmp/kernel-rpms/kernel-devel-${KERNEL_VERSION}.rpm"
 )
 dnf5 -y install "${KERNEL_RPMS[@]}"
 dnf5 versionlock add kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra
 
-# use override to replace mesa and others with less crippled versions
-OVERRIDES=(
-    "libva"
-    "intel-gmmlib"
-    "intel-vpl-gpu-rt"
-    "intel-mediasdk"
-    "libva-intel-media-driver"
-    "mesa-dri-drivers"
-    "mesa-filesystem"
-    "mesa-libEGL"
-    "mesa-libGL"
-    "mesa-libgbm"
-    "mesa-va-drivers"
-    "mesa-vulkan-drivers"
-)
-
-dnf5 distro-sync -y --repo='fedora-multimedia' "${OVERRIDES[@]}"
-dnf5 versionlock add "${OVERRIDES[@]}"
-
-# Disable DKMS support in gnome-software
-if [[ "$IMAGE_NAME" == "silverblue" ]]; then
-    dnf5 remove -y \
-        gnome-software-rpm-ostree
-    dnf5 swap -y \
-        --repo=copr:copr.fedorainfracloud.org:ublue-os:staging \
-        gnome-software gnome-software
-    dnf5 versionlock add gnome-software
-fi
-
+# # use override to replace mesa and others with less crippled versions
+# OVERRIDES=(
+#     "libva"
+#     "intel-gmmlib"
+#     "intel-vpl-gpu-rt"
+#     "intel-mediasdk"
+#     "libva-intel-media-driver"
+#     "mesa-dri-drivers"
+#     "mesa-filesystem"
+#     "mesa-libEGL"
+#     "mesa-libGL"
+#     "mesa-libgbm"
+#     "mesa-va-drivers"
+#     "mesa-vulkan-drivers"
+# )
+#
+# dnf5 distro-sync -y --repo='fedora-multimedia' "${OVERRIDES[@]}"
+# dnf5 versionlock add "${OVERRIDES[@]}"
+#
+# # Disable DKMS support in gnome-software
+# if [[ "$IMAGE_NAME" == "silverblue" ]]; then
+#     dnf5 remove -y \
+#         gnome-software-rpm-ostree
+#     dnf5 swap -y \
+#         --repo=copr:copr.fedorainfracloud.org:ublue-os:staging \
+#         gnome-software gnome-software
+#     dnf5 versionlock add gnome-software
+# fi
+#
 # run common packages script
 /ctx/packages.sh
 
@@ -104,3 +105,7 @@ fi
 CSFG=/usr/lib/systemd/system-generators/coreos-sulogin-force-generator
 curl -sSLo ${CSFG} https://raw.githubusercontent.com/coreos/fedora-coreos-config/refs/heads/stable/overlay.d/05core/usr/lib/systemd/system-generators/coreos-sulogin-force-generator
 chmod +x ${CSFG}
+
+/ctx/zfs.sh
+/ctx/trunk.sh
+/ctx/root.sh

@@ -1,0 +1,4 @@
+[Socket]
+ListenStream=/trunk/socket/buckled.sock
+Accept=no
+RequiredBy=gild.service

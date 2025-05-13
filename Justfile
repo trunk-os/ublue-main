@@ -227,7 +227,7 @@ build-container $image_name="" $fedora_version="" $variant="" $github="":
     pull-retry "{{ source_registry }}/$source_image_name:$fedora_version@$BASE_IMAGE_DIGEST"
 
     # Build Image
-    {{ PODMAN }} build -f Containerfile "${BUILD_ARGS[@]}" "${LABELS[@]}" "${TAGS[@]}"
+    {{ PODMAN }} build --device /dev/fuse -f Containerfile "${BUILD_ARGS[@]}" "${LABELS[@]}" "${TAGS[@]}"
 
     # CI Cleanup
     if [[ -n "${CI:-}" ]]; then

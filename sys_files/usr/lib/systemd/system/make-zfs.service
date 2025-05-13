@@ -1,0 +1,20 @@
+[Unit]
+Description=Create Trunk zpool
+Documentation=man:zfs(8)
+DefaultDependencies=no
+After=systemd-udev-settle.service
+After=zfs-import.target
+After=systemd-remount-fs.service
+After=local-fs.target
+ConditionPathIsDirectory=/sys/module/zfs
+
+Conflicts=umount.target
+Before=umount.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/trunk/scripts/make-zfs.sh
+
+[Install]
+WantedBy=zfs.target

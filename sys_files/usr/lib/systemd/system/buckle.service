@@ -1,0 +1,22 @@
+# vim: ft=systemd
+[Unit]
+Description=Buckle is an agent to control individual systems for Trunk
+DefaultDependencies=yes
+After=zfs-import.target
+After=local-fs.target
+After=make-zfs.service
+After=network-online.target
+ConditionPathIsDirectory=/sys/module/zfs
+
+Conflicts=umount.target
+Before=umount.target
+
+[Service]
+Type=exec
+ExecStartPre=-mkdir -p /trunk/socket
+ExecStartPre=-/usr/bin/podman rm -f buckle
+ExecStart=/usr/bin/podman run --pull=always --privileged --name buckle --device /dev/zfs --net host --pid host --security-opt label=disable -v /trunk:/trunk:shared quay.io/trunk-os/buckle:latest
+Restart=always
+
+[Install]
+WantedBy=default.target

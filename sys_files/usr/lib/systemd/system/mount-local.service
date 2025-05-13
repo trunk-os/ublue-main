@@ -1,0 +1,21 @@
+[Unit]
+Description=Mount /etc and /var into Trunk zpool
+Documentation=man:zfs(8)
+DefaultDependencies=no
+After=systemd-udev-settle.service
+After=zfs-import.target
+After=systemd-remount-fs.service
+After=zfs.target
+After=ostree-remount.service
+ConditionPathIsDirectory=/sys/module/zfs
+
+Conflicts=umount.target
+Before=umount.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/trunk/scripts/mount-local.sh
+
+[Install]
+WantedBy=local-fs.target
